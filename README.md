@@ -1,2 +1,3 @@
-# empresas-rey
-repo para mirar los datos de empresas rey
+# digital twins
+
+repositorio para construir un gemelo digital a través de reinforcement learning
