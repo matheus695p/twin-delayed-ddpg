@@ -1,3 +1,3 @@
-# digital twins
+# TD3 Algorithm 
 
-repositorio para construir un gemelo digital a través de reinforcement learning
+Repositorio para construir un gemelo digital a través de deep reinforcement learning
