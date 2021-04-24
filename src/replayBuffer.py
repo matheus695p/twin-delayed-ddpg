@@ -21,7 +21,7 @@ class ReplayBuffer(object):
         Método de sample, toma de muestras aleatorias de la memoria.
     """
 
-    def __init__(self, max_size=1e6):
+    def __init__(self, max_size=1e8):
         """
         Contructor de de la clase
         Parameters
