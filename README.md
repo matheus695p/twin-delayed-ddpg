@@ -1,4 +1,4 @@
-![Build Status](https://www.repostatus.org/badges/latest/inactive.svg)
+![Build Status](https://www.repostatus.org/badges/latest/concept.svg)
 
 # TD3 algorithm 
 
@@ -16,7 +16,11 @@ Recomiendo el curso:
   <img src="./images/training.png">
 </p>
 
- 
+<p align="center">
+  <img src="./images/training_results.png">
+</p>
+
+
  
 # Biblografía
 
