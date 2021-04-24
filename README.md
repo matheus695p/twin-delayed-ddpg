@@ -14,6 +14,8 @@ Recomiendo el curso:
 
 Paper
 * https://github.com/matheus695p/td3/blob/main/documents/TD3.pdf
+
+
 Repo del autor donde implemento esto
 * https://github.com/sfujim/TD3
 
