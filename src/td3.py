@@ -130,7 +130,7 @@ class TD3(object):
         None.
 
         """
-        # iterar sobre todas las iteraciones
+        # iterar sobre todas las transiciones
         for it in range(iterations):
             # Paso 4: Tomamos una muestra de transiciones (s, s’, a, r)
             # de la memoria.
