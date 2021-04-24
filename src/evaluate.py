@@ -2,6 +2,25 @@ import numpy as np
 
 
 def evaluate_policy(env, policy, eval_episodes=10):
+    """
+    Recive el entorno la politica y el número de episodios cada cuanto se
+    evalua
+
+    Parameters
+    ----------
+    env : gym.env
+        entorno.
+    policy : clase td3
+        politicas.
+    eval_episodes : int, optional
+        número de cada cuanto evaluar. The default is 10.
+
+    Returns
+    -------
+    avg_reward : float
+        recompenza promedio en los episodios.
+
+    """
     avg_reward = 0
     for _ in range(eval_episodes):
         obs = env.reset()

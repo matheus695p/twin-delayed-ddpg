@@ -16,8 +16,40 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Actor(nn.Module):
+    """
+    Construimos una red neuronal para los actores del modelo y target,
+    se saca el número de neuronas del paper que Adressing functions
+    aproximators que esta
+    en la carpeta documents/
+
+    ...
+
+    Attributes
+    ----------
+    object : herencia
+        módulo de redes neuronales de pytorch
+    Methods
+    -------
+    forward(x):
+        propagar adelante la red.
+    """
 
     def __init__(self, state_dim, action_dim, max_action):
+        """
+        Construcor de la red
+        Parameters
+        ----------
+        state_dim : int
+            dimension de los espacios de estados.
+        action_dim : int
+            numero de acciones posibles.
+        max_action : int
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+        """
         super(Actor, self).__init__()
         self.layer_1 = nn.Linear(state_dim, 400)
         self.layer_2 = nn.Linear(400, 300)
@@ -25,6 +57,19 @@ class Actor(nn.Module):
         self.max_action = max_action
 
     def forward(self, x):
+        """
+        Propagar hacia adelante info (forward de la red), aplicando
+        las funciones de activación
+        Parameters
+        ----------
+        x : object
+            red neuronal del actor.
+
+        Returns
+        -------
+        x : object
+            red neuronal del actor.
+        """
         x = F.relu(self.layer_1(x))
         x = F.relu(self.layer_2(x))
         x = self.max_action * torch.tanh(self.layer_3(x))
@@ -32,7 +77,39 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
+    """
+    Construimos una red neuronal para los criticos, se saca el número
+    de neuronas del paper que Adressing functions aproximators que esta
+    en la carpeta documents/
+
+    ...
+
+    Attributes
+    ----------
+    object : herencia
+        módulo de redes neuronales de pytorch
+    Methods
+    -------
+    forward(x):
+        propagar adelante la red.
+    Q1(x, u):
+        propagar adelante la red.
+    """
+
     def __init__(self, state_dim, action_dim):
+        """
+        Construcor de la redes
+        Parameters
+        ----------
+        state_dim : int
+            dimension de los espacios de estados.
+        action_dim : int
+            numero de acciones posibles.
+        Returns
+        -------
+        None.
+
+        """
         super(Critic, self).__init__()
         # Definimos el primero de los Críticos como red neuronal profunda
         self.layer_1 = nn.Linear(state_dim + action_dim, 400)
@@ -44,6 +121,25 @@ class Critic(nn.Module):
         self.layer_6 = nn.Linear(300, 1)
 
     def forward(self, x, u):
+        """
+        Propagar hacia adelante info (forward de la red), aplicando
+        las funciones de activación, además se debe realizar la concatenación
+        de los estados con las acciones
+
+        Parameters
+        ----------
+        x : tensor
+            estados.
+        u : tensor
+            acciones.
+
+        Returns
+        -------
+        x1 : object
+            red de primero de criticos.
+        x2 : object
+            red de segundo de criticos.
+        """
         xu = torch.cat([x, u], 1)
         # Propagación hacia adelante del primero de los Críticos
         x1 = F.relu(self.layer_1(xu))
@@ -56,6 +152,24 @@ class Critic(nn.Module):
         return x1, x2
 
     def Q1(self, x, u):
+        """
+        Método para devolver solo la propagación del primero de los criticos,
+        esto para solo tener este valor Q. Esto es solo para hacer más
+        entendible el código, dado que se puede usar fordward, pero es que
+        solo necesitaremos hacer gradiente ascendente en Q1
+
+        Parameters
+        ----------
+        x : tensor
+            estados.
+        u : tensor
+            acciones.
+        Returns
+        -------
+        x1 : object
+            valor Q solo del primero de los criticos.
+
+        """
         xu = torch.cat([x, u], 1)
         x1 = F.relu(self.layer_1(xu))
         x1 = F.relu(self.layer_2(x1))
@@ -64,8 +178,54 @@ class Critic(nn.Module):
 
 
 class TD3(object):
+    """
+    Construir todo el proceso de entrenamiento del módelo TD3 en una sola
+    clase
+
+    paso4: Esta parte la puede cagar revisar al final
+    # batch_states, batch_next_states, batch_actions,
+    batch_rewards, batch_dones = replay_buffer.sample(batch_size)
+
+
+    ...
+
+    Attributes
+    ----------
+    object : herencia
+        objecto de entrenamiento del módelo
+
+    Methods
+    -------
+    select_action(state):
+        propagar adelante la red.
+    train(replay_buffer, iterations, batch_size=100, discount=0.99,
+          tau=0.005, policy_noise=0.2, noise_clipping=0.5, policy_freq=2):
+        proceso de entrenamiento.
+    save(filename, directory):
+        guardar el módelo.
+    load(filename, directory):
+        cargar el módelo.
+
+    """
 
     def __init__(self, state_dim, action_dim, max_action):
+        """
+        Constructor del entrenamiento del algoritmo
+
+        Parameters
+        ----------
+        state_dim : int
+            dimension de los espacios de estados.
+        action_dim : int
+            numero de acciones posibles.
+        max_action : int
+            máximo valor de las acciones.
+
+        Returns
+        -------
+        None.
+
+        """
         self.actor = Actor(state_dim, action_dim, max_action).to(device)
         self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
         self.actor_target.load_state_dict(self.actor.state_dict())
@@ -77,12 +237,55 @@ class TD3(object):
         self.max_action = max_action
 
     def select_action(self, state):
+        """
+        Seleccionar un acción en función del estado en que me encuentro
+        proceso markoviano
+
+        Parameters
+        ----------
+        state : array
+            estado en el que me encuentro.
+
+        Returns
+        -------
+        tensor de pytorch como estado.
+
+        """
         state = torch.Tensor(state.reshape(1, -1)).to(device)
         return self.actor(state).cpu().data.numpy().flatten()
 
     def train(self, replay_buffer, iterations, batch_size=100,
               discount=0.99, tau=0.005, policy_noise=0.2,
               noise_clipping=0.5, policy_freq=2):
+        """
+        Método de entrenamiento
+
+        Parameters
+        ----------
+        replay_buffer : list
+            memoria.
+        iterations : int
+            número de veces que se va ejecutar el algoritmo.
+        batch_size : int, optional
+            batch size. The default is 100.
+        discount : float, optional
+            gamma del Q learning. The default is 0.99.
+        tau : float, optional
+            tau de la formula. The default is 0.005.
+        policy_noise : float, optional
+            ruido a añadir a la politica, para añadir exploración.
+            The default is 0.2.
+        noise_clipping : float, optional
+            para que ruido no se vaya a la puta, recortar ruido.
+            The default is 0.5.
+        policy_freq : float, optional
+            delay de las iteracion twin delayed. The default is 2.
+
+        Returns
+        -------
+        None.
+
+        """
         for it in range(iterations):
 
             # Paso 4: Tomamos una muestra de transiciones
@@ -176,6 +379,20 @@ class TD3(object):
 
     # Método para guardar el modelo entrenado
     def save(self, filename, directory):
+        """
+        Guardar los modelos de actores y de criticos
+        Parameters
+        ----------
+        filename : string
+            nombre.
+        directory : string
+            donde?.
+
+        Returns
+        -------
+        None.
+
+        """
         torch.save(self.actor.state_dict(), "%s/%s_actor.pth" %
                    (directory, filename))
         torch.save(self.critic.state_dict(), "%s/%s_critic.pth" %
@@ -183,6 +400,20 @@ class TD3(object):
 
     # Método para cargar el modelo entrenado
     def load(self, filename, directory):
+        """
+        Cargar los modelos de actores y de criticos
+        Parameters
+        ----------
+        filename : string
+            nombre.
+        directory : string
+            donde?.
+
+        Returns
+        -------
+        None.
+
+        """
         self.actor.load_state_dict(torch.load(
             "%s/%s_actor.pth" % (directory, filename)))
         self.critic.load_state_dict(torch.load(
@@ -190,6 +421,24 @@ class TD3(object):
 
 
 def evaluate_policy(env, policy, eval_episodes=10):
+    """
+    Recive el entorno la politica y el número de episodios cada cuanto se
+    evalua
+
+    Parameters
+    ----------
+    env : gym.env
+        entorno.
+    policy : clase td3
+        politicas.
+    eval_episodes : int, optional
+        número de cada cuanto evaluar. The default is 10.
+
+    Returns
+    -------
+    avg_reward : float
+        recompenza promedio en los episodios.
+    """
     avg_reward = 0.
     for _ in range(eval_episodes):
         obs = env.reset()

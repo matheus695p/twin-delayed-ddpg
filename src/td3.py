@@ -225,6 +225,20 @@ class TD3(object):
 
     # Método para guardar el modelo entrenado
     def save(self, filename, directory):
+        """
+        Guardar los modelos de actores y de criticos
+        Parameters
+        ----------
+        filename : string
+            nombre.
+        directory : string
+            donde?.
+
+        Returns
+        -------
+        None.
+
+        """
         torch.save(self.actor.state_dict(), "%s/%s_actor.pth" %
                    (directory, filename))
         torch.save(self.critic.state_dict(), "%s/%s_critic.pth" %
@@ -232,6 +246,20 @@ class TD3(object):
 
     # Método para cargar el modelo entrenado
     def load(self, filename, directory):
+        """
+        Cargar los modelos de actores y de criticos
+        Parameters
+        ----------
+        filename : string
+            nombre.
+        directory : string
+            donde?.
+
+        Returns
+        -------
+        None.
+
+        """
         self.actor.load_state_dict(torch.load(
             "%s/%s_actor.pth" % (directory, filename)))
         self.critic.load_state_dict(torch.load(
