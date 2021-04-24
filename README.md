@@ -13,7 +13,7 @@ Recomiendo el curso:
  # Resultado de entrenamiento
  
 <p align="center">
-  <img src="./images/training_results.png">
+  <img src="./images/training.png">
 </p>
 
  
