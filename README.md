@@ -20,7 +20,7 @@ Recomiendo el curso:
   <img src="./images/training_results.png">
 </p>
 
-
+1:30 de entrenamiento en una rtx3080
  
 # Biblografía
 
