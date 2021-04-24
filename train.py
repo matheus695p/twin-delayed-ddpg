@@ -8,6 +8,7 @@ from gym import wrappers
 from src.td3 import TD3
 from src.replayBuffer import ReplayBuffer
 from src.evaluate import evaluate_policy
+from src.utils import (create_folders, mkdir)
 
 # Nombre del entorno (puedes indicar cualquier entorno continuo que
 # quieras probar aquí)
@@ -41,77 +42,71 @@ noise_clip = 0.5
 # (actor modelo)
 policy_freq = 2
 
-
+# configuración del entorno
 file_name = "%s_%s_%s" % ("TD3", env_name, str(seed))
 print("---------------------------------------")
 print("Configuración: %s" % (file_name))
 print("---------------------------------------")
-
-if not os.path.exists("./results"):
-    os.makedirs("./results")
-if save_models and not os.path.exists("./pytorch_models"):
-    os.makedirs("./pytorch_models")
-
 env = gym.make(env_name)
 
+# crear folders si no existe
+create_folders(save_models)
+
+# reproductibilidad
 env.seed(seed)
 torch.manual_seed(seed)
 np.random.seed(seed)
+env.seed(seed)
+torch.manual_seed(seed)
+np.random.seed(seed)
+
+# traer desde el entorno los valores del espacio de acciones
+state_dim = env.observation_space.shape[0]
+action_dim = env.action_space.shape[0]
+max_action = float(env.action_space.high[0])
 state_dim = env.observation_space.shape[0]
 action_dim = env.action_space.shape[0]
 max_action = float(env.action_space.high[0])
 
-env.seed(seed)
-torch.manual_seed(seed)
-np.random.seed(seed)
-state_dim = env.observation_space.shape[0]
-action_dim = env.action_space.shape[0]
-max_action = float(env.action_space.high[0])
-
+# crear la politica, replay buffer y como se van a evaluar
 policy = TD3(state_dim, action_dim, max_action)
 replay_buffer = ReplayBuffer()
 evaluations = [evaluate_policy(env, policy)]
 
-
-def mkdir(base, name):
-    path = os.path.join(base, name)
-    if not os.path.exists(path):
-        os.makedirs(path)
-    return path
-
-
+# crear carpetas de monitoreo
 work_dir = mkdir('exp', 'brs')
 monitor_dir = mkdir(work_dir, 'monitor')
+# máximo numéro de episodios
 max_episode_steps = env._max_episode_steps
+
+# guardar o no el video
 save_env_vid = False
 if save_env_vid:
     env = wrappers.Monitor(env, monitor_dir, force=True)
     env.reset()
 
-
-# inicializar las variables
+# inicializar las variables de entrenamiento
 total_timesteps = 0
 timesteps_since_eval = 0
 episode_num = 0
 done = True
 t0 = time.time()
 
+# es para que existan antes del episodio cero
 episode_reward = 0
 episode_timesteps = 0
 
 # Iniciamos el bucle principal con un total de 500,000 timesteps
 while total_timesteps < max_timesteps:
-
     # Si el episodio ha terminado
     if done:
-
         # Si no estamos en la primera de las iteraciones, arrancamos
         # el proceso de entrenar el modelo
         if total_timesteps != 0:
             print(f"Total Timesteps: {total_timesteps}",
                   f"Episode Num: {episode_num}",
                   f"Reward: {episode_reward}")
-
+            # ajustar pesos de los actores y criticos
             policy.train(replay_buffer, episode_timesteps, batch_size,
                          discount, tau, policy_noise, noise_clip, policy_freq)
 
@@ -132,9 +127,11 @@ while total_timesteps < max_timesteps:
         episode_reward = 0
         episode_timesteps = 0
         episode_num += 1
+
     # Antes de los 10000 timesteps, ejectuamos acciones aleatorias
     if total_timesteps < start_timesteps:
         action = env.action_space.sample()
+
     else:  # Después de los 10000 timesteps, cambiamos al modelo
         action = policy.select_action(np.array(obs))
         # Si el valor de explore_noise no es 0, añadimos ruido a la acción
@@ -143,6 +140,7 @@ while total_timesteps < max_timesteps:
             action = (action + np.random.normal(
                 0, expl_noise, size=env.action_space.shape[0])).clip(
                 env.action_space.low, env.action_space.high)
+
     # El agente ejecuta una acción en el entorno y alcanza el siguiente
     # estado y una recompensa
     new_obs, reward, done, _ = env.step(action)
