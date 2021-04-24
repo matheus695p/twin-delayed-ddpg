@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# cosas de este repo
+results/
+pytorch_models/
+exp/
+
+
 # package yaml
 packaged.yaml
 # Distribution / packaging
