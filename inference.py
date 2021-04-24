@@ -3,7 +3,6 @@ import torch
 import numpy as np
 import pybullet_envs
 from gym import wrappers
-from src.td3 import TD3
 from src.evaluate import evaluate_policy
 from src.utils import (mkdir)
 from src.inference_module import TD3
@@ -26,9 +25,9 @@ env = gym.make(env_name)
 
 max_episode_steps = env._max_episode_steps
 if save_env_vid:
-    # env = wrappers.Monitor(env, monitor_dir, force=True)
-    env = gym.wrappers.Monitor(
-        env, monitor_dir, video_callable=lambda episode_id: True, force=True)
+    env = wrappers.Monitor(env, monitor_dir, force=True)
+    # env = gym.wrappers.Monitor(
+    #     env, monitor_dir, video_callable=lambda episode_id: True, force=True)
 
     env.reset()
 env.seed(seed)
