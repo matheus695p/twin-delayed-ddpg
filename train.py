@@ -126,15 +126,12 @@ while total_timesteps < max_timesteps:
         # Cuando el entrenamiento de un episodio finaliza, reseteamos el
         # entorno
         obs = env.reset()
-
         # Configuramos el valor de done a False
         done = False
-
         # Configuramos la recompensa y el timestep del episodio a cero
         episode_reward = 0
         episode_timesteps = 0
         episode_num += 1
-
     # Antes de los 10000 timesteps, ejectuamos acciones aleatorias
     if total_timesteps < start_timesteps:
         action = env.action_space.sample()
@@ -146,22 +143,17 @@ while total_timesteps < max_timesteps:
             action = (action + np.random.normal(
                 0, expl_noise, size=env.action_space.shape[0])).clip(
                 env.action_space.low, env.action_space.high)
-
     # El agente ejecuta una acción en el entorno y alcanza el siguiente
     # estado y una recompensa
     new_obs, reward, done, _ = env.step(action)
-
     # Comprobamos si el episodio ha terminado
     done_bool = 0 if episode_timesteps + \
         1 == env._max_episode_steps else float(done)
-
     # Incrementamos la recompensa total
     episode_reward += reward
-
     # Almacenamos la nueva transición en la memoria de repetición de
     # experiencias (ReplayBuffer)
     replay_buffer.add((obs, new_obs, action, reward, done_bool))
-
     # Actualizamos el estado, el timestep del número de episodio,
     # el total de timesteps y el número de pasos desde la última
     # evaluación de la política
