@@ -9,6 +9,8 @@ from src.td3 import TD3
 from src.replayBuffer import ReplayBuffer
 from src.evaluate import evaluate_policy
 from src.utils import (create_folders, mkdir)
+from src.visualizations import training_td3_results
+
 
 # Nombre del entorno (puedes indicar cualquier entorno continuo que
 # quieras probar aquí)
@@ -163,6 +165,9 @@ while total_timesteps < max_timesteps:
 # Añadimos la última actualización de la política a la lista de evaluaciones
 # previa y guardamos nuestro modelo
 evaluations.append(evaluate_policy(env, policy))
+# ver resultados
+training_td3_results(evaluations, max_timesteps, name=env_name)
+
 if save_models:
     policy.save("%s" % (file_name), directory="./pytorch_models")
 np.save("./results/%s" % (file_name), evaluations)
