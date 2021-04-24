@@ -20,7 +20,7 @@ Recomiendo el curso:
   <img src="./images/training_results.png">
 </p>
 
-
+1:30 de entrenamiento en una rtx3080
  
 # Biblografía
 
@@ -28,7 +28,7 @@ Paper
 * https://github.com/matheus695p/td3/blob/main/documents/TD3.pdf
 
 
-Repo del autor donde implemento esto
+Repo del autor donde implemento el algoritmo y todos chupamos conocimiento
 * https://github.com/sfujim/TD3
 
 
