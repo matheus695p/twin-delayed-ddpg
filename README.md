@@ -10,6 +10,14 @@ Mi objetivo en el repo es estudiar y llevar esto al contexto de optimización de
 Recomiendo el curso:
 * https://www.udemy.com/course/aprendizaje-por-refuerzo-profundo/ que me lo recomendó @sebawsky 
  
+ # Resultado de entrenamiento
+ 
+<p align="center">
+  <img src="./images/training_results.png">
+</p>
+
+ 
+ 
 # Biblografía
 
 Paper
