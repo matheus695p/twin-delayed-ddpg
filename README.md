@@ -78,7 +78,7 @@ Paper
 * https://github.com/matheus695p/td3/blob/main/documents/TD3.pdf
 
 
-Repo del autor donde implemento el algoritmo y todos chupamos conocimiento
+Repo del autor donde implemento el algoritmo y todos absorvemos conocimiento
 * https://github.com/sfujim/TD3
 
 
